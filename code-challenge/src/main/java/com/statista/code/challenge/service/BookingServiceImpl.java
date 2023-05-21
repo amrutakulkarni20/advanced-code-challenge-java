@@ -1,12 +1,11 @@
 package com.statista.code.challenge.service;
 
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.Currencies;
 import com.statista.code.challenge.repository.BookingDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -35,13 +34,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Integer> getBookingByDepartment(String department) {
-        return bookingDataRepository.findByDepartment(department);
+    public BookingIds getBookingByDepartment(String department) {
+        return new BookingIds(bookingDataRepository.findByDepartment(department));
     }
 
     @Override
-    public Set<String> getUsedCurrencies() {
-        return bookingDataRepository.getUsedCurrencies();
+    public Currencies getUsedCurrencies() {
+        return new Currencies(bookingDataRepository.getUsedCurrencies());
     }
 
     @Override

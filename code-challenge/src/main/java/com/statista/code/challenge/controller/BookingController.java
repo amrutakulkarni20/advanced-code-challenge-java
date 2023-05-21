@@ -1,6 +1,8 @@
 package com.statista.code.challenge.controller;
 
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.Currencies;
 import com.statista.code.challenge.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/bookingService")
@@ -38,12 +38,12 @@ public class BookingController {
     }
 
     @GetMapping("/bookings/department/{department}")
-    public List<Integer> getBookingByDepartment(@PathVariable("department") String department){
+    public BookingIds getBookingByDepartment(@PathVariable("department") String department){
         return bookingService.getBookingByDepartment(department);
     }
 
     @GetMapping("/bookings/currencies")
-    public Set<String> getUsedCurrencies(){
+    public Currencies getUsedCurrencies(){
         return bookingService.getUsedCurrencies();
     }
 

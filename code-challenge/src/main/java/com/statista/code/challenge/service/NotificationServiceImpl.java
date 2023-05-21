@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import com.statista.code.challenge.model.BookingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 
 @Service
 public class NotificationServiceImpl implements NotificationService{
@@ -31,6 +32,10 @@ public class NotificationServiceImpl implements NotificationService{
                 + "Booking Details:\n\n"
                 + "Booking Id: " + bookingModel.getBookingId() + "\n"
                 + "Department: " + bookingModel.getDepartment() + "\n"
-                + "Start date of subscription: " + bookingModel.getSubscriptionStartDate();
+                + "Start date of subscription: " + dateConvertor(bookingModel.getSubscriptionStartDate());
+    }
+
+    private Date dateConvertor(long subscriptionStartDate){
+        return new Date(subscriptionStartDate);
     }
 }

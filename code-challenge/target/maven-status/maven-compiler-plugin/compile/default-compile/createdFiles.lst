@@ -8,7 +8,6 @@ com\statista\code\challenge\util\SingletonBookingMap.class
 com\statista\code\challenge\model\DateTimeDeserializer.class
 com\statista\code\challenge\BookingApplication.class
 com\statista\code\challenge\controller\BookingController.class
-com\statista\code\challenge\config\SwaggerConfig.class
 com\statista\code\challenge\model\BookingModel.class
 com\statista\code\challenge\constant\Constant.class
 com\statista\code\challenge\exception\GlobalExceptionHandler.class

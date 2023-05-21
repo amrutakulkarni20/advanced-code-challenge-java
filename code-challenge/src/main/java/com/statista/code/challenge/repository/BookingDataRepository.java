@@ -19,6 +19,4 @@ public interface BookingDataRepository {
 
     Set<String> getUsedCurrencies();
 
-
-
     }

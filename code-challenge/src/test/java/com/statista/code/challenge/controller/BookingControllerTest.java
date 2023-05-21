@@ -1,48 +1,28 @@
-/*
 package com.statista.code.challenge.controller;
 
+import Model.BookingModelTest;
 import com.statista.code.challenge.BookingApplication;
-import com.statista.code.challenge.constant.Constant;
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
-import com.statista.code.challenge.service.BookingService;
-import com.statista.code.challenge.util.Currency;
-import org.junit.Assert;
-
-import org.junit.Ignore;
-import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.statista.code.challenge.model.Currencies;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import static org.junit.Assert.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        classes = {BookingApplication.class})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {BookingApplication.class})
 @TestPropertySource(locations = "classpath:test.properties")
-@Ignore
  public class BookingControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private BookingService bookingService;
 
     @Value("${server.port}")
-    private String port;
+    private String testPort;
 
     @Value("${application.test.host}")
     private String host;
@@ -52,13 +32,175 @@ import java.util.List;
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Test
+    void createsNewBookingAndVerifiesBookingIdWithStatusCode() {
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertSame(1,bookingResponse.getBody().getBookingId());
+    }
 
     @Test
-    public void createsNewBooking() {
-        BookingModel booking = createMockBooking();
-        HttpEntity<BookingModel> bookingRequest = new HttpEntity<>(booking,getHttpHeader());
-        ResponseEntity<Integer> response = restTemplate.exchange(createURLWithPort("/bookingService/booking",host,port),HttpMethod.POST,bookingRequest,Integer.class);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    void createsNewBookingWithInvalidCurrencyAndVerifiesResponse(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"UUSSDD",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+    }
+
+    @Test
+    void createBookingWithInvalidEmailIdAndVerifiesResponse(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"email","Data dept");
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+    }
+
+    @Test
+    void createBookingWithInvalidPriceAndVerifiesResponse(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",0,"USD",1621544631000L,"email@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+    }
+
+    @Test
+    void createBookingWithoutDepartmentAndVerifiesResponse(){
+        BookingModelTest booking = createBookingWithoutDepartment();
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+    }
+
+    private BookingModelTest createBookingWithoutDepartment(){
+        BookingModelTest booking = new BookingModelTest();
+        booking.setDescription("Cool description!");
+        booking.setPrice(10.00);
+        booking.setCurrency("USD");
+        booking.setSubscriptionStartDate(1621544631000L);
+        booking.setEmail("email@gmail.com");
+        return new BookingModelTest();
+    }
+
+    @Test
+    void createBookingWithoutSubscriptionStartDateAndVerifiesResponse(){
+        BookingModelTest booking = createBookingWithoutSubscriptionStartDate();
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+    }
+
+    private BookingModelTest createBookingWithoutSubscriptionStartDate(){
+        BookingModelTest booking = new BookingModelTest();
+        booking.setDescription("Cool description!");
+        booking.setPrice(10.00);
+        booking.setCurrency("USD");
+        booking.setEmail("email@gmail.com");
+        booking.setDepartment("Data dept");
+        return new BookingModelTest();
+    }
+
+    @Test
+    void getsBookingByIdSuccessfully(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse = createNewBooking(booking);
+        ResponseEntity<BookingModel> bookingResponse = getBooking(bookingCreationResponse.getBody().getBookingId());
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertSame(bookingCreationResponse.getBody().getBookingId(),bookingResponse.getBody().getBookingId());
+    }
+
+    @Test
+    void getsBookingByIdWithoutCreatingBooking(){
+        ResponseEntity<BookingModel> bookingResponse = getBooking(102);
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertNull(bookingResponse.getBody());
+    }
+    @Test
+    void getsBookingByDepartmentSuccessfully(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
+        ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
+        ResponseEntity<BookingIds> bookingResponse = getBookingByDepartment(bookingCreationResponse1.getBody().getDepartment());
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+    }
+
+    @Test
+    void getsEmptyBookingIdListWhenDepartmentNotFound(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
+        ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
+        ResponseEntity<BookingIds> bookingResponse = getBookingByDepartment("test");
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertNull(bookingResponse.getBody().getBookingIds());
+    }
+
+    @Test
+    void getUsedCurrenciesListSuccessfully(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
+        BookingModelTest booking2 = new BookingModelTest("Cool description!",10.00,"INR",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking2);
+        ResponseEntity<Currencies> bookingResponse = getUsedCurrencyList();
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+    }
+
+
+    @Test
+    void getSumOfBookingPriceByGivenCurrencySuccessfully(){
+        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"INR",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
+        BookingModelTest booking2 = new BookingModelTest("Cool description!",10.00,"INR",1621544631000L,"abc@gmail.com","Data dept");
+        ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking2);
+        ResponseEntity<Double> bookingResponse = getSumOfBookingPriceByGivenCurrency("INR");
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+    }
+    private ResponseEntity<BookingModel> createNewBooking(BookingModelTest booking) {
+        HttpEntity<BookingModelTest> bookingRequest = new HttpEntity<>(booking,getHttpHeader());
+        ResponseEntity<BookingModel> bookingResponse = restTemplate.postForEntity(createURLWithPort("/bookingService/booking",host, testPort), bookingRequest, BookingModel.class);
+        return bookingResponse;
+    }
+
+    private ResponseEntity<BookingModel> getBooking(int bookingId) {
+        HttpEntity<BookingModel> entity = new HttpEntity<>(getHttpHeader());
+        ResponseEntity<BookingModel> booking = restTemplate.exchange(createURLForGetRequest("/bookingService/booking/",host,testPort,bookingId), HttpMethod.GET, entity, BookingModel.class);
+        return booking;
+    }
+
+    private ResponseEntity<BookingIds> getBookingByDepartment(String department) {
+        HttpEntity<ArrayList<Integer>> entity = new HttpEntity<>(getHttpHeader());
+        ResponseEntity<BookingIds> bookings = restTemplate.exchange(createURLForGetBookingByDepartment("/bookingService/bookings/department/",host,testPort,department), HttpMethod.GET, entity, BookingIds.class);
+        return bookings;
+    }
+
+    private ResponseEntity<Currencies> getUsedCurrencyList() {
+        HttpEntity<HashSet<String>> entity = new HttpEntity<>(getHttpHeader());
+        ResponseEntity<Currencies> bookings = restTemplate.exchange(createURLForgetUsedCurrencies("/bookingService/bookings/currencies",host,testPort), HttpMethod.GET, entity, Currencies.class);
+        return bookings;
+    }
+
+    private ResponseEntity<Double> getSumOfBookingPriceByGivenCurrency(String currency) {
+        HttpEntity<Double> entity = new HttpEntity<>(getHttpHeader());
+        ResponseEntity<Double> bookings = restTemplate.exchange(createURLToGetSumOfCurrency("/bookingService/sum/",host,testPort,currency), HttpMethod.GET, entity, Double.class);
+        return bookings;
     }
 
     private HttpHeaders getHttpHeader(){
@@ -72,39 +214,64 @@ import java.util.List;
 
     public static String createURLWithPort(final String uri, final String host,
                                            final String port) {
-        return "http://" + host + ":" + port + uri;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("http://")
+                .append(host)
+                .append(":")
+                .append(port)
+                .append(uri);
+        String result = stringBuilder.toString();
+        return result;
     }
 
-    @Test
-    public void testGetBookingsByBookingId() throws Exception {
-
-        BookingModel booking = createMockBooking();
-        Mockito.when(bookingService.getBookingById(1)).thenReturn(booking);
-        mockMvc.perform(MockMvcRequestBuilders.get(Constant.URL, 1))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.bookingId").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.department").value("CS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currency").value("USD"));
-    }
-    private BookingModel createMockBooking(){
-
-        BookingModel booking = new BookingModel(1,"description",10.00, Currency.USD, LocalDateTime.now(),"valid4@email.ok","CS");
-        return booking;
+    public static String createURLForGetRequest(final String uri, final String host,
+                                           final String port, final int bookingId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("http://")
+                .append(host)
+                .append(":")
+                .append(port)
+                .append(uri)
+                .append(bookingId);
+        String result = stringBuilder.toString();
+        return result;
     }
 
-    @Test
-    void testGetBookingsByDepartment() throws Exception{
-        List<Integer> bookings = createMockBookingIdList();
-        Mockito.when(bookingService.getBookingByDepartment("CS")).thenReturn(bookings);
-        List<Integer> bookingModelList = bookingService.getBookingByDepartment("CS");
-        Assert.assertTrue(!bookingModelList.isEmpty());
-    }
-    private List<Integer> createMockBookingIdList(){
-        List<Integer> bookingList = new ArrayList<>();
-        bookingList.add(1);
-        bookingList.add(2);
-        return bookingList;
+    public static String createURLForGetBookingByDepartment(final String uri, final String host,
+                                                final String port, final String department) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("http://")
+                .append(host)
+                .append(":")
+                .append(port)
+                .append(uri)
+                .append(department);
+        String result = stringBuilder.toString();
+        return result;
     }
 
+    public static String createURLForgetUsedCurrencies(final String uri, final String host,
+                                                       final String port){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("http://")
+                .append(host)
+                .append(":")
+                .append(port)
+                .append(uri);
+        String result = stringBuilder.toString();
+        return result;
+    }
+
+    private static String createURLToGetSumOfCurrency(final String uri, final String host,
+                                                      final String port, final String currency) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("http://")
+                .append(host)
+                .append(":")
+                .append(port)
+                .append(uri)
+                .append(currency);
+        String result = stringBuilder.toString();
+        return result;
+    }
 }
-*/
