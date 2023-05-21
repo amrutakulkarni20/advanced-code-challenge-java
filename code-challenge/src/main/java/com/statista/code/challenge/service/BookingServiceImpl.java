@@ -1,8 +1,7 @@
 package com.statista.code.challenge.service;
 
 import com.statista.code.challenge.model.BookingModel;
-import com.statista.code.challenge.repository.BookingRepository;
-import com.statista.code.challenge.repository.BookingRepositoryImpl;
+import com.statista.code.challenge.repository.BookingDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,33 +12,41 @@ import java.util.Set;
 public class BookingServiceImpl implements BookingService {
 
     @Autowired
-    private BookingRepository bookingRepository;
+    private BookingDataRepository bookingDataRepository;
+
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
-    public void createBooking(BookingModel bookingModel) {
-        bookingRepository.save(bookingModel);
+    public BookingModel createBooking(BookingModel bookingModel) {
+         BookingModel booking = bookingDataRepository.save(bookingModel);
+        notificationService.sendEmailNotification(bookingModel);
+        return booking;
     }
 
     @Override
-    public void updateBooking(BookingModel bookingModel, int bookingId) {
-        bookingRepository.update(bookingModel, bookingId);
+    public BookingModel updateBooking(int bookingId, BookingModel bookingModel) {
+        return bookingDataRepository.update(bookingId, bookingModel);
     }
 
     @Override
     public BookingModel getBookingById(int bookingId) {
-        return bookingRepository.findByBookingId(bookingId);
+        return bookingDataRepository.findByBookingId(bookingId);
     }
+
     @Override
     public List<Integer> getBookingByDepartment(String department) {
-        return bookingRepository.findByDepartment(department);
+        return bookingDataRepository.findByDepartment(department);
     }
+
     @Override
     public Set<String> getUsedCurrencies() {
-        return bookingRepository.getUsedCurrencies();
+        return bookingDataRepository.getUsedCurrencies();
     }
 
     @Override
     public double getSumByCurrency(String currency) {
-        return bookingRepository.getSumByCurrency(currency);
+        return bookingDataRepository.getSumByCurrency(currency);
     }
 
 

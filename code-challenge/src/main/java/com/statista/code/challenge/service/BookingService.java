@@ -8,7 +8,9 @@ import java.util.Set;
 
 @Service
 public interface BookingService {
-    void createBooking(BookingModel bookingModel);
+    BookingModel createBooking(BookingModel bookingModel);
+
+    BookingModel updateBooking(int bookingId, BookingModel bookingModel);
 
     BookingModel getBookingById(int bookingId);
 
@@ -18,5 +20,5 @@ public interface BookingService {
 
     Set<String> getUsedCurrencies();
 
-    void updateBooking(BookingModel bookingModel, int bookingId);
+
 }
