@@ -1,8 +1,6 @@
 package com.statista.code.challenge.util;
 import com.statista.code.challenge.model.BookingModel;
 import com.statista.code.challenge.model.BusinessModel;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

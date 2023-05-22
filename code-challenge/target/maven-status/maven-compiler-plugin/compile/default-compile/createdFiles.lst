@@ -1,7 +1,7 @@
-com\statista\code\challenge\model\BookingIds.class
 com\statista\code\challenge\service\BusinessFactory.class
 com\statista\code\challenge\util\Currency.class
 com\statista\code\challenge\service\BookingServiceImpl.class
+com\statista\code\challenge\model\BookingIdResponse.class
 com\statista\code\challenge\model\Notification.class
 com\statista\code\challenge\service\BusinessFactory$1.class
 com\statista\code\challenge\util\SingletonBookingMap.class

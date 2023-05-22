@@ -132,7 +132,7 @@ import static org.junit.Assert.*;
         BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
         ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
         ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
-        ResponseEntity<BookingIds> bookingResponse = getBookingByDepartment(bookingCreationResponse1.getBody().getDepartment());
+        ResponseEntity<BookingIdResponse> bookingResponse = getBookingByDepartment(bookingCreationResponse1.getBody().getDepartment());
         assertNotNull(bookingResponse);
         assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
     }
@@ -142,7 +142,7 @@ import static org.junit.Assert.*;
         BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
         ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
         ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
-        ResponseEntity<BookingIds> bookingResponse = getBookingByDepartment("test");
+        ResponseEntity<BookingIdResponse> bookingResponse = getBookingByDepartment("test");
         assertNotNull(bookingResponse);
         assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
         assertNull(bookingResponse.getBody().getBookingIds());
@@ -216,9 +216,9 @@ import static org.junit.Assert.*;
         return booking;
     }
 
-    private ResponseEntity<BookingIds> getBookingByDepartment(String department) {
+    private ResponseEntity<BookingIdResponse> getBookingByDepartment(String department) {
         HttpEntity<ArrayList<Integer>> entity = new HttpEntity<>(getHttpHeader());
-        ResponseEntity<BookingIds> bookings = restTemplate.exchange(createURLForGetBookingByDepartment("/bookingService/bookings/department/",host,testPort,department), HttpMethod.GET, entity, BookingIds.class);
+        ResponseEntity<BookingIdResponse> bookings = restTemplate.exchange(createURLForGetBookingByDepartment("/bookingService/bookings/department/",host,testPort,department), HttpMethod.GET, entity, BookingIdResponse.class);
         return bookings;
     }
 

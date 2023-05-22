@@ -1,6 +1,6 @@
 package com.statista.code.challenge.service;
 
-import com.statista.code.challenge.model.BookingIds;
+import com.statista.code.challenge.model.BookingIdResponse;
 import com.statista.code.challenge.model.BookingModel;
 import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
@@ -8,11 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import javax.validation.Valid;
 
 @Api(tags = "Booking Service Application", value = "")
 public interface SwaggerDocumentation {
@@ -35,7 +32,7 @@ public interface SwaggerDocumentation {
     @ApiOperation(value = "Get Booking Ids from given Department", notes = "This API returns a JSON list of all bookings ids with the given department.")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Booking created successfully.")})
     @ApiResponse(code = 400, message = "Input request Validation Failed.")
-    public BookingIds getBookingByDepartment(@PathVariable("department") String department);
+    public BookingIdResponse getBookingByDepartment(@PathVariable("department") String department);
 
     @ApiOperation(value = "Get List of used currencies", notes = "This API returns a JSON list with all used currencies in the existing bookings.")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Booking created successfully.")})

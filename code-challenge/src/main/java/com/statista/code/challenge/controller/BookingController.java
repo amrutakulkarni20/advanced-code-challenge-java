@@ -1,6 +1,6 @@
 package com.statista.code.challenge.controller;
 
-import com.statista.code.challenge.model.BookingIds;
+import com.statista.code.challenge.model.BookingIdResponse;
 import com.statista.code.challenge.model.BookingModel;
 import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
@@ -41,7 +41,7 @@ public class BookingController implements SwaggerDocumentation {
     }
 
     @GetMapping("/bookings/department/{department}")
-    public BookingIds getBookingByDepartment(@PathVariable("department") String department){
+    public BookingIdResponse getBookingByDepartment(@PathVariable("department") String department){
         return bookingService.getBookingByDepartment(department);
     }
 

@@ -46,8 +46,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingIds getBookingByDepartment(String department) {
-        return new BookingIds(bookingDataRepository.findByDepartment(department));
+    public BookingIdResponse getBookingByDepartment(String department) {
+        return new BookingIdResponse(bookingDataRepository.findByDepartment(department));
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void doBusiness(int bookingId, BusinessModel businessModel) {
         businessRepository.doBusiness(bookingId,businessModel);
-        Notification notification = createBookingActivationEmail(bookingId, businessModel);
+        Notification notification = createBookingActivationEmail(businessModel);
         notificationService.sendNotification(notification);
     }
 
@@ -81,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
         return notification;
     }
 
-    private Notification createBookingActivationEmail(int bookingId, BusinessModel businessModel) {
+    private Notification createBookingActivationEmail(BusinessModel businessModel) {
         StringBuilder body = new StringBuilder();
         Notification notification = new Notification();
         LocalDate currentDate = LocalDate.now();
