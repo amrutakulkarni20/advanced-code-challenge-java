@@ -1,4 +1,4 @@
-package com.statista.code.challenge.util;
+package com.statista.code.challenge.model;
 
 public enum Currency {
 

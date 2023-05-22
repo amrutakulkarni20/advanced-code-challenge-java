@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationServiceImpl implements NotificationService{
-    Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     @Override
     public void sendNotification(Notification notification) {
@@ -17,6 +17,5 @@ public class NotificationServiceImpl implements NotificationService{
         logger.info("Subject: {} ", notification.getSubject());
         logger.info("Body:\n{} ", notification.getBody());
     }
-
 
 }

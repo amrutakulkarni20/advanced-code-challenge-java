@@ -1,6 +1,5 @@
 package com.statista.code.challenge.config;
 
-import com.statista.code.challenge.constant.Constant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -15,6 +14,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
+    private static final String PACKAGE_NAME = "com.statista.code.challenge.controller";
+
     ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Booking Service")
@@ -25,7 +26,7 @@ public class SwaggerConfig {
 
     @Bean
     public Docket swaggerImplementation() {
-        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(Constant.PACKAGE_NAME))
+        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(PACKAGE_NAME))
                 .build().apiInfo(apiInfo());
     }
 }

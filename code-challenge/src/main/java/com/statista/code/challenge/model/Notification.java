@@ -15,11 +15,7 @@ public class Notification {
 
     private String emailFrom;
     private String emailTo;
-
     private String subject;
-
     private String body;
-
     private String host;
-
 }

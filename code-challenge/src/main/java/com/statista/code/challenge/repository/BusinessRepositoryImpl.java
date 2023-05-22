@@ -13,19 +13,18 @@ import java.util.Map;
 public class BusinessRepositoryImpl implements BusinessRepository{
 
     @Autowired
-    BusinessFactory businessFactory;
+    private BusinessFactory businessFactory;
 
     @Override
     public void doBusiness(int bookingId, BusinessModel businessModel) {
-        String department = businessModel.getDepartment().name();
-        Business businessImplementation = businessFactory.getImplementation(Departments.valueOf(department));
+        Business businessImplementation = businessFactory.getImplementation(businessModel.getDepartment());
         businessImplementation.doBusiness(bookingId,businessModel);
     }
 
     @Override
     public BusinessModel getBusiness(int bookingId) {
-        SingletonBookingMap singletonMap1 = SingletonBookingMap.getInstance();
-        Map<Integer, BusinessModel> businessMap = singletonMap1.getBusinessMap();
+        SingletonBookingMap bookings = SingletonBookingMap.getInstance();
+        Map<Integer, BusinessModel> businessMap = bookings.getBusinessMap();
         return businessMap.get(bookingId);
     }
 }

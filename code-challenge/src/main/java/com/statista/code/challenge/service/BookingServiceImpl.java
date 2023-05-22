@@ -1,10 +1,13 @@
 package com.statista.code.challenge.service;
 
-import com.statista.code.challenge.constant.Constant;
-import com.statista.code.challenge.model.*;
-import com.statista.code.challenge.repository.BookingDataRepository;
+import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.BusinessModel;
+import com.statista.code.challenge.model.Notification;
+import com.statista.code.challenge.model.BookingIds;
+import com.statista.code.challenge.model.Currencies;
+import com.statista.code.challenge.model.Notification;
+import com.statista.code.challenge.repository.BookingRepository;
 import com.statista.code.challenge.repository.BusinessRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -12,14 +15,29 @@ import java.time.LocalDate;
 @Service
 public class BookingServiceImpl implements BookingService {
 
-    @Autowired
-    private BookingDataRepository bookingDataRepository;
-
-    @Autowired
+    private BookingRepository bookingRepository;
     private NotificationService notificationService;
+    private BusinessRepository businessRepository;
 
-    @Autowired
-    BusinessRepository businessRepository;
+    private static final String SUBJECT_BOOKING = "Thank you for Booking!";
+
+    private static final String BODY_BOOKING = "Dear Customer\n\n"
+            +"Thank you for Booking.\n\n"
+            +"We're excited to have you! Below, you'll find the information regarding your Booking\n\n"
+            + "Booking Details: \n\n";
+
+    private static final String SUBJECT_ACTIVATION = "Welcome to Statista !!!";
+
+    private static final String BODY_ACTIVATION = "Dear Customer\n\n"
+            +"Thank you for your interest in Statista. Welcome to the Statista Family\n\n"
+            +"You're ready to start enjoying the Statista's services \n\n"
+            + "Your Account Information: \n\n";
+
+    public BookingServiceImpl(BookingRepository bookingRepository, NotificationService notificationService, BusinessRepository businessRepository){
+        this.bookingRepository = bookingRepository;
+        this.notificationService = notificationService;
+        this.businessRepository = businessRepository;
+    }
 
     @Value("${spring.mail.host}")
     private String host;
@@ -29,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingModel createBooking(BookingModel bookingModel) {
-        BookingModel booking = bookingDataRepository.save(bookingModel);
+        BookingModel booking = bookingRepository.save(bookingModel);
         Notification notification = createBookingConfirmationEmail(bookingModel);
         notificationService.sendNotification(notification);
         return booking;
@@ -37,27 +55,27 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingModel updateBooking(int bookingId, BookingModel bookingModel) {
-        return bookingDataRepository.update(bookingId, bookingModel);
+        return bookingRepository.update(bookingId, bookingModel);
     }
 
     @Override
     public BookingModel getBookingById(int bookingId) {
-        return bookingDataRepository.findByBookingId(bookingId);
+        return bookingRepository.findByBookingId(bookingId);
     }
 
     @Override
-    public BookingIdResponse getBookingByDepartment(String department) {
-        return new BookingIdResponse(bookingDataRepository.findByDepartment(department));
+    public BookingIds getBookingByDepartment(String department) {
+        return bookingRepository.findByDepartment(department);
     }
 
     @Override
     public Currencies getUsedCurrencies() {
-        return new Currencies(bookingDataRepository.getUsedCurrencies());
+        return bookingRepository.getUsedCurrencies();
     }
 
     @Override
     public double getSumByCurrency(String currency) {
-        return bookingDataRepository.getSumByCurrency(currency);
+        return bookingRepository.getSumByCurrency(currency);
     }
 
     @Override
@@ -68,35 +86,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Notification createBookingConfirmationEmail(BookingModel bookingModel) {
-        StringBuilder body = new StringBuilder();
+        StringBuilder emailBody = new StringBuilder();
         Notification notification = new Notification();
-        body.append(Constant.BODY_BOOKING)
-                .append("Booking Id: " + bookingModel.getBookingId() + "\n")
-                .append("Department: " + bookingModel.getDepartment());
+        emailBody.append(BODY_BOOKING)
+                .append("Booking Id: ").append(bookingModel.getBookingId()).append("\n")
+                .append("Department: ").append( bookingModel.getDepartment()).append("\n");
         notification.setEmailFrom(senderEmail);
         notification.setEmailTo(bookingModel.getEmail());
-        notification.setSubject(Constant.SUBJECT_BOOKING);
-        notification.setBody(body.toString());
+        notification.setSubject(SUBJECT_BOOKING);
+        notification.setBody(emailBody.toString());
         notification.setHost(host);
         return notification;
     }
 
     private Notification createBookingActivationEmail(BusinessModel businessModel) {
-        StringBuilder body = new StringBuilder();
+        StringBuilder emailBody = new StringBuilder();
         Notification notification = new Notification();
         LocalDate currentDate = LocalDate.now();
         LocalDate oneYearFromNow = currentDate.plusYears(1);
-        body.append(Constant.BODY_ACTIVATION)
-                .append("Email: " + businessModel.getEmail() + "\n")
-                .append("Department: " + businessModel.getDepartment()+ "\n")
-                .append("Business Plan: " + businessModel.getBusinessPlan()+ "\n")
-                .append("Region: "+ businessModel.getRegion()+ "\n")
-                .append("Subscription start date: "+ currentDate+ "\n")
-                .append("Subscription end date: "+ oneYearFromNow+ "\n");
+        emailBody.append(BODY_ACTIVATION)
+                .append("Email: ").append(businessModel.getEmail()).append("\n")
+                .append("Department: ").append(businessModel.getDepartment()).append("\n")
+                .append("Business Plan: ").append(businessModel.getBusinessPlan()).append("\n")
+                .append("Region: ").append(businessModel.getRegion()).append("\n")
+                .append("Subscription start date: ").append(currentDate).append("\n")
+                .append("Subscription end date: ").append(oneYearFromNow).append("\n");
         notification.setEmailFrom(senderEmail);
         notification.setEmailTo(businessModel.getEmail());
-        notification.setSubject(Constant.SUBJECT_ACTIVATION);
-        notification.setBody(body.toString());
+        notification.setSubject(SUBJECT_ACTIVATION);
+        notification.setBody(emailBody.toString());
         notification.setHost(host);
         return notification;
     }

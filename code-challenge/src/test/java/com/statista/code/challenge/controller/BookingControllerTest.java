@@ -10,14 +10,17 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {BookingApplication.class})
 @TestPropertySource(locations = "classpath:test.properties")
- public class BookingControllerTest {
+public class BookingControllerTest {
 
     @Value("${server.port}")
     private String testPort;
@@ -32,55 +35,55 @@ import static org.junit.Assert.*;
 
     @Test
     void createsNewBookingAndVerifiesBookingIdWithStatusCode() {
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "USD", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
         assertNotNull(bookingResponse);
         assertNotNull(bookingResponse.getBody());
         assertNotNull(bookingResponse.getStatusCode());
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
-        assertSame(1,bookingResponse.getBody().getBookingId());
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
+        assertSame(1, bookingResponse.getBody().getBookingId());
     }
 
     @Test
-    void createsNewBookingWithInvalidCurrencyAndVerifiesResponse(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"UUSSDD",1621544631000L,"abc@gmail.com","Data dept");
+    void createsNewBookingWithInvalidCurrencyAndVerifiesResponse() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "UUSSDD", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
         assertNotNull(bookingResponse);
         assertNotNull(bookingResponse.getStatusCode());
-        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST, bookingResponse.getStatusCode());
     }
 
     @Test
-    void createBookingWithInvalidEmailIdAndVerifiesResponse(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"email","Data dept");
-        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
-        assertNotNull(bookingResponse);
-        assertNotNull(bookingResponse.getBody());
-        assertNotNull(bookingResponse.getStatusCode());
-        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
-    }
-
-    @Test
-    void createBookingWithInvalidPriceAndVerifiesResponse(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",0,"USD",1621544631000L,"email@gmail.com","Data dept");
+    void createBookingWithInvalidEmailIdAndVerifiesResponse() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "USD", 1621544631000L, "email", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
         assertNotNull(bookingResponse);
         assertNotNull(bookingResponse.getBody());
         assertNotNull(bookingResponse.getStatusCode());
-        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST, bookingResponse.getStatusCode());
     }
 
     @Test
-    void createBookingWithoutDepartmentAndVerifiesResponse(){
+    void createBookingWithInvalidPriceAndVerifiesResponse() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 0, "USD", 1621544631000L, "email@gmail.com", Departments.valueOf("Pharma"));
+        ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
+        assertNotNull(bookingResponse);
+        assertNotNull(bookingResponse.getBody());
+        assertNotNull(bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST, bookingResponse.getStatusCode());
+    }
+
+    @Test
+    void createBookingWithoutDepartmentAndVerifiesResponse() {
         BookingModelTest booking = createBookingWithoutDepartment();
         ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
         assertNotNull(bookingResponse);
         assertNotNull(bookingResponse.getBody());
         assertNotNull(bookingResponse.getStatusCode());
-        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST, bookingResponse.getStatusCode());
     }
 
-    private BookingModelTest createBookingWithoutDepartment(){
+    private BookingModelTest createBookingWithoutDepartment() {
         BookingModelTest booking = new BookingModelTest();
         booking.setDescription("Cool description!");
         booking.setPrice(10.00);
@@ -91,150 +94,151 @@ import static org.junit.Assert.*;
     }
 
     @Test
-    void createBookingWithoutSubscriptionStartDateAndVerifiesResponse(){
+    void createBookingWithoutSubscriptionStartDateAndVerifiesResponse() {
         BookingModelTest booking = createBookingWithoutSubscriptionStartDate();
         ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
         assertNotNull(bookingResponse);
         assertNotNull(bookingResponse.getBody());
         assertNotNull(bookingResponse.getStatusCode());
-        assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.BAD_REQUEST, bookingResponse.getStatusCode());
     }
 
-    private BookingModelTest createBookingWithoutSubscriptionStartDate(){
+    private BookingModelTest createBookingWithoutSubscriptionStartDate() {
         BookingModelTest booking = new BookingModelTest();
         booking.setDescription("Cool description!");
         booking.setPrice(10.00);
         booking.setCurrency("USD");
         booking.setEmail("email@gmail.com");
-        booking.setDepartment("Data dept");
+        booking.setDepartment(Departments.valueOf("Pharma"));
         return new BookingModelTest();
     }
 
     @Test
-    void getsBookingByIdSuccessfully(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+    void getsBookingByIdSuccessfully() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "USD", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingCreationResponse = createNewBooking(booking);
         ResponseEntity<BookingModel> bookingResponse = getBooking(bookingCreationResponse.getBody().getBookingId());
         assertNotNull(bookingResponse);
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
-        assertSame(bookingCreationResponse.getBody().getBookingId(),bookingResponse.getBody().getBookingId());
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
+        assertSame(bookingCreationResponse.getBody().getBookingId(), bookingResponse.getBody().getBookingId());
     }
 
     @Test
-    void getsBookingByIdWithoutCreatingBooking(){
+    void getsBookingByIdWithoutCreatingBooking() {
         ResponseEntity<BookingModel> bookingResponse = getBooking(102);
         assertNotNull(bookingResponse);
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
         assertNull(bookingResponse.getBody());
-    }
-    @Test
-    void getsBookingByDepartmentSuccessfully(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
-        ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
-        ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
-        ResponseEntity<BookingIdResponse> bookingResponse = getBookingByDepartment(bookingCreationResponse1.getBody().getDepartment());
-        assertNotNull(bookingResponse);
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
     }
 
     @Test
-    void getsEmptyBookingIdListWhenDepartmentNotFound(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+    void getsBookingByDepartmentSuccessfully() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "USD", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
         ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
-        ResponseEntity<BookingIdResponse> bookingResponse = getBookingByDepartment("test");
+        ResponseEntity<BookingIds> bookingResponse = getBookingByDepartment(bookingCreationResponse1.getBody().getDepartment().name());
         assertNotNull(bookingResponse);
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
+    }
+
+    @Test
+    void getsEmptyBookingIdListWhenDepartmentNotFound() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "USD", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
+        ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
+        ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking);
+        ResponseEntity<BookingIds> bookingResponse = getBookingByDepartment("test");
+        assertNotNull(bookingResponse);
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
         assertNull(bookingResponse.getBody().getBookingIds());
     }
 
     @Test
-    void getUsedCurrenciesListSuccessfully(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"USD",1621544631000L,"abc@gmail.com","Data dept");
+    void getUsedCurrenciesListSuccessfully() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "USD", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
-        BookingModelTest booking2 = new BookingModelTest("Cool description!",10.00,"INR",1621544631000L,"abc@gmail.com","Data dept");
+        BookingModelTest booking2 = new BookingModelTest("Cool description!", 10.00, "INR", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking2);
         ResponseEntity<Currencies> bookingResponse = getUsedCurrencyList();
         assertNotNull(bookingResponse);
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
     }
 
 
     @Test
-    void getSumOfBookingPriceByGivenCurrencySuccessfully(){
-        BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"INR",1621544631000L,"abc@gmail.com","Data dept");
+    void getSumOfBookingPriceByGivenCurrencySuccessfully() {
+        BookingModelTest booking = new BookingModelTest("Cool description!", 10.00, "INR", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingCreationResponse1 = createNewBooking(booking);
-        BookingModelTest booking2 = new BookingModelTest("Cool description!",10.00,"INR",1621544631000L,"abc@gmail.com","Data dept");
+        BookingModelTest booking2 = new BookingModelTest("Cool description!", 10.00, "INR", 1621544631000L, "abc@gmail.com", Departments.valueOf("Pharma"));
         ResponseEntity<BookingModel> bookingCreationResponse2 = createNewBooking(booking2);
         ResponseEntity<Double> bookingResponse = getSumOfBookingPriceByGivenCurrency("INR");
         assertNotNull(bookingResponse);
-        assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
+        assertSame(HttpStatus.OK, bookingResponse.getStatusCode());
     }
 
     @Test
     void createsNewBusinessAndVerifiesStatusCode() {
-        BusinessModel business = new BusinessModel(Departments.valueOf("Pharma"),"NRW", "Basic","test@gmail.com");
+        BusinessModel business = new BusinessModel(Departments.valueOf("Pharma"), "NRW", "Basic", "test@gmail.com");
         int bookingId = 1;
-        ResponseEntity<BusinessModel> businessResponse = createNewBusiness(bookingId,business);
+        ResponseEntity<BusinessModel> businessResponse = createNewBusiness(bookingId, business);
         assertNotNull(businessResponse);
         assertNotNull(businessResponse.getStatusCode());
-        assertSame(HttpStatus.OK,businessResponse.getStatusCode());
+        assertSame(HttpStatus.OK, businessResponse.getStatusCode());
     }
 
     @Test
-    void getBusinessSuccessfully(){
-        BusinessModel business = new BusinessModel(Departments.valueOf("Pharma"),"NRW", "Basic","test@gmail.com");
+    void getBusinessSuccessfully() {
+        BusinessModel business = new BusinessModel(Departments.valueOf("Pharma"), "NRW", "Basic", "test@gmail.com");
         int bookingId = 1;
-        ResponseEntity<BusinessModel> createBusinessResponse = createNewBusiness(bookingId,business);
+        ResponseEntity<BusinessModel> createBusinessResponse = createNewBusiness(bookingId, business);
         ResponseEntity<BusinessModel> getBusiness = getBusinessSuccessfullyFromBookingId(bookingId);
         assertNotNull(getBusiness);
-        assertSame(HttpStatus.OK,getBusiness.getStatusCode());
+        assertSame(HttpStatus.OK, getBusiness.getStatusCode());
     }
 
 
     private ResponseEntity<BusinessModel> createNewBusiness(int bookingId, BusinessModel business) {
-        HttpEntity<BusinessModel> businessRequest = new HttpEntity<>(business,getHttpHeader());
-        ResponseEntity<BusinessModel> businessResponse = restTemplate.postForEntity((String) createURLForDoBusiness("/bookingService/doBusiness/",host, testPort,bookingId),businessRequest, BusinessModel.class);
+        HttpEntity<BusinessModel> businessRequest = new HttpEntity<>(business, getHttpHeader());
+        ResponseEntity<BusinessModel> businessResponse = restTemplate.postForEntity((String) createURLForDoBusiness("/bookingService/doBusiness/", host, testPort, bookingId), businessRequest, BusinessModel.class);
         return businessResponse;
     }
 
     private ResponseEntity<BusinessModel> getBusinessSuccessfullyFromBookingId(int bookingId) {
         HttpEntity<BusinessModel> entity = new HttpEntity<>(getHttpHeader());
-        ResponseEntity<BusinessModel> business = restTemplate.exchange(createURLForGetRequest("/bookingService/getBusiness/",host,testPort,bookingId), HttpMethod.GET, entity, BusinessModel.class);
+        ResponseEntity<BusinessModel> business = restTemplate.exchange(createURLForGetRequest("/bookingService/getBusiness/", host, testPort, bookingId), HttpMethod.GET, entity, BusinessModel.class);
         return business;
     }
 
     private ResponseEntity<BookingModel> createNewBooking(BookingModelTest booking) {
-        HttpEntity<BookingModelTest> bookingRequest = new HttpEntity<>(booking,getHttpHeader());
-        ResponseEntity<BookingModel> bookingResponse = restTemplate.postForEntity(createURLWithPort("/bookingService/booking",host, testPort), bookingRequest, BookingModel.class);
+        HttpEntity<BookingModelTest> bookingRequest = new HttpEntity<>(booking, getHttpHeader());
+        ResponseEntity<BookingModel> bookingResponse = restTemplate.postForEntity(createURLWithPort("/bookingService/booking", host, testPort), bookingRequest, BookingModel.class);
         return bookingResponse;
     }
 
     private ResponseEntity<BookingModel> getBooking(int bookingId) {
         HttpEntity<BookingModel> entity = new HttpEntity<>(getHttpHeader());
-        ResponseEntity<BookingModel> booking = restTemplate.exchange(createURLForGetRequest("/bookingService/booking/",host,testPort,bookingId), HttpMethod.GET, entity, BookingModel.class);
+        ResponseEntity<BookingModel> booking = restTemplate.exchange(createURLForGetRequest("/bookingService/booking/", host, testPort, bookingId), HttpMethod.GET, entity, BookingModel.class);
         return booking;
     }
 
-    private ResponseEntity<BookingIdResponse> getBookingByDepartment(String department) {
+    private ResponseEntity<BookingIds> getBookingByDepartment(String department) {
         HttpEntity<ArrayList<Integer>> entity = new HttpEntity<>(getHttpHeader());
-        ResponseEntity<BookingIdResponse> bookings = restTemplate.exchange(createURLForGetBookingByDepartment("/bookingService/bookings/department/",host,testPort,department), HttpMethod.GET, entity, BookingIdResponse.class);
+        ResponseEntity<BookingIds> bookings = restTemplate.exchange(createURLForGetBookingByDepartment("/bookingService/bookings/department/", host, testPort, department), HttpMethod.GET, entity, BookingIds.class);
         return bookings;
     }
 
     private ResponseEntity<Currencies> getUsedCurrencyList() {
         HttpEntity<HashSet<String>> entity = new HttpEntity<>(getHttpHeader());
-        ResponseEntity<Currencies> bookings = restTemplate.exchange(createURLForgetUsedCurrencies("/bookingService/bookings/currencies",host,testPort), HttpMethod.GET, entity, Currencies.class);
+        ResponseEntity<Currencies> bookings = restTemplate.exchange(createURLForgetUsedCurrencies("/bookingService/bookings/currencies", host, testPort), HttpMethod.GET, entity, Currencies.class);
         return bookings;
     }
 
     private ResponseEntity<Double> getSumOfBookingPriceByGivenCurrency(String currency) {
         HttpEntity<Double> entity = new HttpEntity<>(getHttpHeader());
-        ResponseEntity<Double> bookings = restTemplate.exchange(createURLToGetSumOfCurrency("/bookingService/sum/",host,testPort,currency), HttpMethod.GET, entity, Double.class);
+        ResponseEntity<Double> bookings = restTemplate.exchange(createURLToGetSumOfCurrency("/bookingService/sum/", host, testPort, currency), HttpMethod.GET, entity, Double.class);
         return bookings;
     }
 
-    private HttpHeaders getHttpHeader(){
+    private HttpHeaders getHttpHeader() {
         httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         List<MediaType> mediatypeList = new ArrayList<>();
@@ -256,7 +260,7 @@ import static org.junit.Assert.*;
     }
 
     public static String createURLForGetRequest(final String uri, final String host,
-                                           final String port, final int bookingId) {
+                                                final String port, final int bookingId) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("http://")
                 .append(host)
@@ -264,11 +268,11 @@ import static org.junit.Assert.*;
                 .append(port)
                 .append(uri)
                 .append(bookingId);
-        String result = stringBuilder.toString();
-        return result;
+        return stringBuilder.toString();
     }
+
     public static String createURLForGetBookingByDepartment(final String uri, final String host,
-                                                final String port, final String department) {
+                                                            final String port, final String department) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("http://")
                 .append(host)
@@ -276,20 +280,18 @@ import static org.junit.Assert.*;
                 .append(port)
                 .append(uri)
                 .append(department);
-        String result = stringBuilder.toString();
-        return result;
+        return stringBuilder.toString();
     }
 
     public static String createURLForgetUsedCurrencies(final String uri, final String host,
-                                                       final String port){
+                                                       final String port) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("http://")
                 .append(host)
                 .append(":")
                 .append(port)
                 .append(uri);
-        String result = stringBuilder.toString();
-        return result;
+        return stringBuilder.toString();
     }
 
     private static String createURLToGetSumOfCurrency(final String uri, final String host,
@@ -301,8 +303,7 @@ import static org.junit.Assert.*;
                 .append(port)
                 .append(uri)
                 .append(currency);
-        String result = stringBuilder.toString();
-        return result;
+        return stringBuilder.toString();
     }
 
     private Object createURLForDoBusiness(String uri, String host, String testPort, int bookingId) {
@@ -313,10 +314,8 @@ import static org.junit.Assert.*;
                 .append(testPort)
                 .append(uri)
                 .append(bookingId);
-        String result = stringBuilder.toString();
-        return result;
+        return stringBuilder.toString();
     }
-
 
 
 }

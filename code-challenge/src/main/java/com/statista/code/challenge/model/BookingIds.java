@@ -3,11 +3,11 @@ package com.statista.code.challenge.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookingIdResponse {
+public class BookingIds {
 
-    public BookingIdResponse(){}
+    public BookingIds(){}
 
-    public BookingIdResponse(List<Integer> bookingIds) {
+    public BookingIds(List<Integer> bookingIds) {
         this.bookingIds = bookingIds;
     }
 

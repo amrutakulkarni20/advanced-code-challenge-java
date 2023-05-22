@@ -4,6 +4,7 @@ import com.statista.code.challenge.model.BusinessModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 public class SingletonBookingMap {
     private static SingletonBookingMap instance;
     private Map<Integer, BookingModel> bookingMap;

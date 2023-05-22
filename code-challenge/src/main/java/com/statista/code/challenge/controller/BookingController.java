@@ -1,38 +1,32 @@
 package com.statista.code.challenge.controller;
 
-import com.statista.code.challenge.model.BookingIdResponse;
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
 import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
 import com.statista.code.challenge.service.BookingService;
 import javax.validation.Valid;
-
-import com.statista.code.challenge.service.SwaggerDocumentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.statista.code.challenge.service.IBookingController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bookingService")
-public class BookingController implements SwaggerDocumentation {
+public class BookingController implements IBookingController {
 
-    @Autowired
     private BookingService bookingService;
+
+    public BookingController(BookingService bookingService){
+        this.bookingService = bookingService;
+    }
 
     @PostMapping("/booking")
     public BookingModel createBooking(@Valid @RequestBody BookingModel bookingModel) {
         return bookingService.createBooking(bookingModel);
-
     }
 
-    @PostMapping("/bookings/{bookingId}")
+    @PutMapping("/bookings/{bookingId}")
     public BookingModel updateBooking(@PathVariable("bookingId") int bookingId, @RequestBody BookingModel bookingModel) {
         return bookingService.updateBooking(bookingId,bookingModel);
-
     }
 
     @GetMapping("/booking/{bookingId}")
@@ -41,7 +35,7 @@ public class BookingController implements SwaggerDocumentation {
     }
 
     @GetMapping("/bookings/department/{department}")
-    public BookingIdResponse getBookingByDepartment(@PathVariable("department") String department){
+    public BookingIds getBookingByDepartment(@PathVariable("department") String department){
         return bookingService.getBookingByDepartment(department);
     }
 
@@ -56,7 +50,7 @@ public class BookingController implements SwaggerDocumentation {
     }
 
     @PostMapping("/doBusiness/{bookingId}")
-    public void doBusiness(@PathVariable("bookingId") int bookingId, @RequestBody BusinessModel businessModel) {
+    public void doBusiness(@PathVariable("bookingId") int bookingId, @Valid @RequestBody BusinessModel businessModel) {
         bookingService.doBusiness(bookingId, businessModel);
     }
 

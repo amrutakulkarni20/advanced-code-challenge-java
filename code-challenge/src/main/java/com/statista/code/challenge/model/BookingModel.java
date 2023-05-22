@@ -1,6 +1,5 @@
 package com.statista.code.challenge.model;
 
-import com.statista.code.challenge.util.Currency;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -35,6 +34,6 @@ public class BookingModel {
     private String email;
 
     @NotNull(message = "Department cannot be left blank.")
-    private String department;
+    private Departments department;
 
 }

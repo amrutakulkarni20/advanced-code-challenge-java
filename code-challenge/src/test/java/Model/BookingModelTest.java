@@ -1,6 +1,6 @@
 package Model;
 
-import com.statista.code.challenge.util.Currency;
+import com.statista.code.challenge.model.Departments;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -13,15 +13,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class BookingModelTest {
+
     private String description;
-
     private double price;
-
     private String currency;
-
     private long subscriptionStartDate;
-
     private String email;
-
-    private String department;
+    private Departments department;
 }

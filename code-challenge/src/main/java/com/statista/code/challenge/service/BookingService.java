@@ -1,6 +1,6 @@
 package com.statista.code.challenge.service;
 
-import com.statista.code.challenge.model.BookingIdResponse;
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
 import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
@@ -14,7 +14,7 @@ public interface BookingService {
 
     BookingModel getBookingById(int bookingId);
 
-    BookingIdResponse getBookingByDepartment(String department);
+    BookingIds getBookingByDepartment(String department);
 
     double getSumByCurrency(String currency);
 
