@@ -33,7 +33,8 @@ public class BookingDataRepositoryImpl implements BookingDataRepository {
             List<Integer>bookingModelList = departmentMap.get(department);
             bookingModelList.add(bookingModel.getBookingId());
         }else{
-            departmentMap.put(department,new ArrayList<>(List.of(bookingModel.getBookingId())));
+            departmentMap.put(department, new ArrayList<>(Arrays.asList(bookingModel.getBookingId())));
+
         }
     }
     private void saveBookingByCurrency(BookingModel bookingModel){

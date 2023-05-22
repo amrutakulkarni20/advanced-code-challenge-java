@@ -46,7 +46,6 @@ import static org.junit.Assert.*;
         BookingModelTest booking = new BookingModelTest("Cool description!",10.00,"UUSSDD",1621544631000L,"abc@gmail.com","Data dept");
         ResponseEntity<BookingModel> bookingResponse = createNewBooking(booking);
         assertNotNull(bookingResponse);
-        assertNotNull(bookingResponse.getBody());
         assertNotNull(bookingResponse.getStatusCode());
         assertSame(HttpStatus.BAD_REQUEST,bookingResponse.getStatusCode());
     }

@@ -5,7 +5,9 @@ import com.statista.code.challenge.model.BookingModel;
 import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
 import com.statista.code.challenge.service.BookingService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
+
+import com.statista.code.challenge.service.SwaggerDocumentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/bookingService")
-public class BookingController {
+public class BookingController implements SwaggerDocumentation {
 
     @Autowired
     private BookingService bookingService;

@@ -16,11 +16,11 @@ public class BusinessFactory {
     public Business getImplementation(Departments department){
 
         switch (department){
-            case ECommerce -> {
+            case ECommerce : {
                 return ECommerceDepartmentImpl;
-            } case Pharma -> {
+            } case Pharma : {
                 return pharmaDepartmentImpl;
-            } default -> throw new IllegalStateException("Unexpected value of department" +department);
+            } default : throw new IllegalStateException("Unexpected value of department" +department);
         }
     }
 }
