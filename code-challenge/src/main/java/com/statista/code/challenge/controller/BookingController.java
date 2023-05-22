@@ -2,6 +2,7 @@ package com.statista.code.challenge.controller;
 
 import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
 import com.statista.code.challenge.service.BookingService;
 import jakarta.validation.Valid;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bookingService")
@@ -50,5 +53,15 @@ public class BookingController {
     @GetMapping("/sum/{currency}")
     public double getSumByCurrency(@PathVariable("currency") String currency){
         return bookingService.getSumByCurrency(currency);
+    }
+
+    @PostMapping("/doBusiness/{bookingId}")
+    public void doBusiness(@PathVariable("bookingId") int bookingId, @RequestBody BusinessModel businessModel) {
+        bookingService.doBusiness(bookingId, businessModel);
+    }
+
+    @GetMapping("/getBusiness/{bookingId}")
+    public BusinessModel getBusiness(@PathVariable("bookingId") int bookingId) {
+       return bookingService.getBusiness(bookingId);
     }
 }

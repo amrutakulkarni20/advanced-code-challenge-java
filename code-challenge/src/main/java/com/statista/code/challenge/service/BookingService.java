@@ -2,8 +2,11 @@ package com.statista.code.challenge.service;
 
 import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Currencies;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface BookingService {
@@ -19,5 +22,8 @@ public interface BookingService {
 
     Currencies getUsedCurrencies();
 
+    void doBusiness(int bookingId, BusinessModel businessModel);
+
+    BusinessModel getBusiness(int bookingId);
 
 }

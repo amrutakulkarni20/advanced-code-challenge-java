@@ -1,41 +1,22 @@
 package com.statista.code.challenge.service;
 
+import com.statista.code.challenge.model.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.statista.code.challenge.model.BookingModel;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.util.Date;
 
 @Service
 public class NotificationServiceImpl implements NotificationService{
-    @Value("${spring.mail.host}")
-    private String host;
-    @Value("${spring.mail.email}")
-    private String senderEmail;
-    @Value("${spring.mail.subject}")
-    private String subject;
-
     Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
+
     @Override
-    public void sendEmailNotification(BookingModel bookingModel) {
-        String body = createEmailBody(bookingModel);
-        logger.info("Host: {} ",  host);
-        logger.info("Email From: {} ", senderEmail);
-        logger.info("Email To: {} ", bookingModel.getEmail());
-        logger.info("Subject: {} ", subject);
-        logger.info("Body:\n{} ", body);
+    public void sendNotification(Notification notification) {
+        logger.info("Host: {} ",  notification.getHost());
+        logger.info("Email From: {} ", notification.getEmailFrom());
+        logger.info("Email To: {} ", notification.getEmailTo());
+        logger.info("Subject: {} ", notification.getSubject());
+        logger.info("Body:\n{} ", notification.getBody());
     }
 
-    private String createEmailBody(BookingModel bookingModel) {
-        return "We are pleased to confirm your Booking. Please review the details below:\n\n"
-                + "Booking Details:\n\n"
-                + "Booking Id: " + bookingModel.getBookingId() + "\n"
-                + "Department: " + bookingModel.getDepartment() + "\n"
-                + "Start date of subscription: " + dateConvertor(bookingModel.getSubscriptionStartDate());
-    }
 
-    private Date dateConvertor(long subscriptionStartDate){
-        return new Date(subscriptionStartDate);
-    }
 }

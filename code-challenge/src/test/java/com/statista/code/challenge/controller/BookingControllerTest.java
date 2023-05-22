@@ -2,9 +2,7 @@ package com.statista.code.challenge.controller;
 
 import Model.BookingModelTest;
 import com.statista.code.challenge.BookingApplication;
-import com.statista.code.challenge.model.BookingIds;
-import com.statista.code.challenge.model.BookingModel;
-import com.statista.code.challenge.model.Currencies;
+import com.statista.code.challenge.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -173,6 +171,40 @@ import static org.junit.Assert.*;
         assertNotNull(bookingResponse);
         assertSame(HttpStatus.OK,bookingResponse.getStatusCode());
     }
+
+    @Test
+    void createsNewBusinessAndVerifiesStatusCode() {
+        BusinessModel business = new BusinessModel(Departments.valueOf("Pharma"),"NRW", "Basic","test@gmail.com");
+        int bookingId = 1;
+        ResponseEntity<BusinessModel> businessResponse = createNewBusiness(bookingId,business);
+        assertNotNull(businessResponse);
+        assertNotNull(businessResponse.getStatusCode());
+        assertSame(HttpStatus.OK,businessResponse.getStatusCode());
+    }
+
+    @Test
+    void getBusinessSuccessfully(){
+        BusinessModel business = new BusinessModel(Departments.valueOf("Pharma"),"NRW", "Basic","test@gmail.com");
+        int bookingId = 1;
+        ResponseEntity<BusinessModel> createBusinessResponse = createNewBusiness(bookingId,business);
+        ResponseEntity<BusinessModel> getBusiness = getBusinessSuccessfullyFromBookingId(bookingId);
+        assertNotNull(getBusiness);
+        assertSame(HttpStatus.OK,getBusiness.getStatusCode());
+    }
+
+
+    private ResponseEntity<BusinessModel> createNewBusiness(int bookingId, BusinessModel business) {
+        HttpEntity<BusinessModel> businessRequest = new HttpEntity<>(business,getHttpHeader());
+        ResponseEntity<BusinessModel> businessResponse = restTemplate.postForEntity((String) createURLForDoBusiness("/bookingService/doBusiness/",host, testPort,bookingId),businessRequest, BusinessModel.class);
+        return businessResponse;
+    }
+
+    private ResponseEntity<BusinessModel> getBusinessSuccessfullyFromBookingId(int bookingId) {
+        HttpEntity<BusinessModel> entity = new HttpEntity<>(getHttpHeader());
+        ResponseEntity<BusinessModel> business = restTemplate.exchange(createURLForGetRequest("/bookingService/getBusiness/",host,testPort,bookingId), HttpMethod.GET, entity, BusinessModel.class);
+        return business;
+    }
+
     private ResponseEntity<BookingModel> createNewBooking(BookingModelTest booking) {
         HttpEntity<BookingModelTest> bookingRequest = new HttpEntity<>(booking,getHttpHeader());
         ResponseEntity<BookingModel> bookingResponse = restTemplate.postForEntity(createURLWithPort("/bookingService/booking",host, testPort), bookingRequest, BookingModel.class);
@@ -236,7 +268,6 @@ import static org.junit.Assert.*;
         String result = stringBuilder.toString();
         return result;
     }
-
     public static String createURLForGetBookingByDepartment(final String uri, final String host,
                                                 final String port, final String department) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -274,4 +305,19 @@ import static org.junit.Assert.*;
         String result = stringBuilder.toString();
         return result;
     }
+
+    private Object createURLForDoBusiness(String uri, String host, String testPort, int bookingId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("http://")
+                .append(host)
+                .append(":")
+                .append(testPort)
+                .append(uri)
+                .append(bookingId);
+        String result = stringBuilder.toString();
+        return result;
+    }
+
+
+
 }
