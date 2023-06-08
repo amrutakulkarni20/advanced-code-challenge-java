@@ -5,11 +5,11 @@ import com.statista.code.challenge.model.BusinessModel;
 import com.statista.code.challenge.model.Notification;
 import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.Currencies;
-import com.statista.code.challenge.model.Notification;
 import com.statista.code.challenge.repository.BookingRepository;
 import com.statista.code.challenge.repository.BusinessRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 
 @Service

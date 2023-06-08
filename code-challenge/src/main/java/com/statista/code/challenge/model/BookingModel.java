@@ -3,6 +3,8 @@ package com.statista.code.challenge.model;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -22,7 +24,7 @@ public class BookingModel {
 
     @NotNull(message = "Price cannot be left blank.")
     @DecimalMin(value = "0.0", inclusive = false, message = "Value must be greater than 0.")
-    private double price;
+    private double price;//TODO
 
     @NotNull(message = "Currency cannot be left blank.")
     private Currency currency;
