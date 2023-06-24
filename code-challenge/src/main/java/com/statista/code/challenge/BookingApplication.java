@@ -13,7 +13,7 @@ public class BookingApplication {
 
     private static Logger logger = LoggerFactory.getLogger(BookingApplication.class);
     public static void main(String[] args) {
-        logger.info("Welcome to Booking Service");
+        logger.info("Welcome to Booking Service...");
         SpringApplication.run(BookingApplication.class, args);
     }
 }
