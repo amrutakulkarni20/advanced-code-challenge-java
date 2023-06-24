@@ -20,6 +20,7 @@ com\statista\code\challenge\repository\BusinessRepository.class
 com\statista\code\challenge\repository\BusinessRepositoryImpl.class
 com\statista\code\challenge\controller\BookingController.class
 com\statista\code\challenge\model\BookingModel.class
+com\statista\code\challenge\aspect\BookingServiceAspect.class
 com\statista\code\challenge\service\IBookingController.class
 com\statista\code\challenge\exception\GlobalExceptionHandler.class
 com\statista\code\challenge\repository\BookingRepository.class
