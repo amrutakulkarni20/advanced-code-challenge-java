@@ -1,22 +1,27 @@
 package com.statista.code.challenge.service;
 
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.BusinessModel;
+import com.statista.code.challenge.model.Currencies;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Set;
 
 @Service
 public interface BookingService {
-    void createBooking(BookingModel bookingModel);
+    BookingModel createBooking(BookingModel bookingModel);
+
+    BookingModel updateBooking(int bookingId, BookingModel bookingModel);
 
     BookingModel getBookingById(int bookingId);
 
-    List<Integer> getBookingByDepartment(String department);
+    BookingIds getBookingByDepartment(String department);
 
     double getSumByCurrency(String currency);
 
-    Set<String> getUsedCurrencies();
+    Currencies getUsedCurrencies();
 
-    void updateBooking(BookingModel bookingModel, int bookingId);
+    void doBusiness(int bookingId, BusinessModel businessModel);
+
+    BusinessModel getBusiness(int bookingId);
+
 }

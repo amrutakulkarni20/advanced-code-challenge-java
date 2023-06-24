@@ -1,29 +1,32 @@
 package com.statista.code.challenge.controller;
 
+import com.statista.code.challenge.model.BookingIds;
 import com.statista.code.challenge.model.BookingModel;
+import com.statista.code.challenge.model.BusinessModel;
+import com.statista.code.challenge.model.Currencies;
 import com.statista.code.challenge.service.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import javax.validation.Valid;
+import com.statista.code.challenge.service.IBookingController;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Set;
-
 @RestController
-@RequestMapping("/bookingservice")
-public class BookingController {
-    @Autowired
+@RequestMapping("/bookingService")
+public class BookingController implements IBookingController {
+    
     private BookingService bookingService;
-    @PostMapping("/booking")
-    public ResponseEntity createBooking(@RequestBody BookingModel bookingModel) {
-        bookingService.createBooking(bookingModel);
-        return ResponseEntity.ok().build();
+
+    public BookingController(BookingService bookingService){
+        this.bookingService = bookingService;
     }
 
-    @PostMapping("/bookings/{bookingId}")
-    public ResponseEntity updateBooking(@RequestBody BookingModel bookingModel,@PathVariable("bookingId") int bookingId) {
-        bookingService.updateBooking(bookingModel,bookingId);
-        return ResponseEntity.ok().build();
+    @PostMapping("/booking")
+    public BookingModel createBooking(@Valid @RequestBody BookingModel bookingModel) {
+        return bookingService.createBooking(bookingModel);
+    }
+
+    @PutMapping("/bookings/{bookingId}")
+    public BookingModel updateBooking(@PathVariable("bookingId") int bookingId, @RequestBody BookingModel bookingModel) {
+        return bookingService.updateBooking(bookingId,bookingModel);
     }
 
     @GetMapping("/booking/{bookingId}")
@@ -32,15 +35,27 @@ public class BookingController {
     }
 
     @GetMapping("/bookings/department/{department}")
-    public List<Integer> getBookingByDepartment(@PathVariable("department") String department){
+    public BookingIds getBookingByDepartment(@PathVariable("department") String department){
         return bookingService.getBookingByDepartment(department);
     }
+
     @GetMapping("/bookings/currencies")
-    public Set<String> getUsedCurrencies(){
+    public Currencies getUsedCurrencies(){
         return bookingService.getUsedCurrencies();
     }
+
     @GetMapping("/sum/{currency}")
     public double getSumByCurrency(@PathVariable("currency") String currency){
         return bookingService.getSumByCurrency(currency);
+    }
+
+    @PostMapping("/doBusiness/{bookingId}")
+    public void doBusiness(@PathVariable("bookingId") int bookingId, @Valid @RequestBody BusinessModel businessModel) {
+        bookingService.doBusiness(bookingId, businessModel);
+    }
+
+    @GetMapping("/getBusiness/{bookingId}")
+    public BusinessModel getBusiness(@PathVariable("bookingId") int bookingId) {
+       return bookingService.getBusiness(bookingId);
     }
 }
